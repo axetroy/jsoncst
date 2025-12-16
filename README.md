@@ -5,56 +5,56 @@
 ![Node](https://img.shields.io/badge/node-%3E=14-blue.svg?style=flat-square)
 [![npm version](https://badge.fury.io/js/jsoncst.svg)](https://badge.fury.io/js/jsoncst)
 
-一个用于修改 JSON 字符串的工具库，能够在修改值的同时保留原始格式、注释和空白字符。
+A utility to patch JSON strings while preserving the original formatting, including comments and whitespace.
 
-## ✨ 特性
+## ✨ Features
 
-- 🎨 **保留格式** - 完整保留注释、空白字符和原始格式
-- 🔄 **精准修改** - 仅修改指定的值，其他内容保持不变
-- 🚀 **快速轻量** - 零依赖，体积小巧
-- 📦 **开箱即用** - 无需配置，简单易用
-- 💪 **TypeScript 支持** - 完整的类型定义
-- 🎯 **多种路径语法** - 支持点号路径和 JSON Pointer
+- 🎨 **Format Preservation** - Maintains comments, whitespace, and original formatting
+- 🔄 **Precise Modifications** - Only changes specified values, leaving everything else intact
+- 🚀 **Fast & Lightweight** - Zero dependencies, minimal footprint
+- 📦 **Zero Configuration** - Works out of the box with sensible defaults
+- 💪 **TypeScript Support** - Full type definitions included
+- 🎯 **Flexible Path Syntax** - Supports both dot notation and JSON Pointer
 
-## 📦 安装
+## 📦 Installation
 
 ```bash
 npm install jsoncst
 ```
 
-或使用其他包管理器：
+Or using other package managers:
 
 ```bash
 yarn add jsoncst
-# 或
+# or
 pnpm add jsoncst
 ```
 
-## 🚀 快速开始
+## 🚀 Quick Start
 
-### 基础用法
+### Basic Usage
 
 ```js
 import { replace } from "jsoncst";
 
 const source = '{"name": "Alice", "age": 30}';
 
-// 修改单个值
+// Replace a single value
 const result = replace(source, [
   { path: "age", value: "31" }
 ]);
 
 console.log(result);
-// 输出: {"name": "Alice", "age": 31}
+// Output: {"name": "Alice", "age": 31}
 ```
 
-### 保留格式和注释
+### Preserving Format and Comments
 
 ```js
 const source = `{
-  // 用户信息
+  // User information
   "name": "Alice",
-  "age": 30, /* 年龄 */
+  "age": 30, /* years old */
   "city": "Beijing"
 }`;
 
@@ -63,17 +63,17 @@ const result = replace(source, [
 ]);
 
 console.log(result);
-// 输出: {
-//   // 用户信息
+// Output: {
+//   // User information
 //   "name": "Alice",
-//   "age": 31, /* 年龄 */
+//   "age": 31, /* years old */
 //   "city": "Beijing"
 // }
 ```
 
-## 📖 使用示例
+## 📖 Usage Examples
 
-### 修改嵌套对象
+### Modifying Nested Objects
 
 ```js
 const source = '{"user": {"name": "Alice", "profile": {"age": 30}}}';
@@ -82,10 +82,10 @@ const result = replace(source, [
   { path: "user.profile.age", value: "31" }
 ]);
 
-// 结果: {"user": {"name": "Alice", "profile": {"age": 31}}}
+// Result: {"user": {"name": "Alice", "profile": {"age": 31}}}
 ```
 
-### 修改数组元素
+### Modifying Array Elements
 
 ```js
 const source = '{"scores": [85, 90, 95]}';
@@ -94,10 +94,10 @@ const result = replace(source, [
   { path: "scores[1]", value: "92" }
 ]);
 
-// 结果: {"scores": [85, 92, 95]}
+// Result: {"scores": [85, 92, 95]}
 ```
 
-### 使用 JSON Pointer
+### Using JSON Pointer
 
 ```js
 const source = '{"data": {"items": [1, 2, 3]}}';
@@ -106,10 +106,10 @@ const result = replace(source, [
   { path: "/data/items/2", value: "99" }
 ]);
 
-// 结果: {"data": {"items": [1, 2, 99]}}
+// Result: {"data": {"items": [1, 2, 99]}}
 ```
 
-### 批量修改多个值
+### Batch Modifications
 
 ```js
 const source = '{"x": 1, "y": 2, "arr": [3, 4]}';
@@ -120,10 +120,10 @@ const result = replace(source, [
   { path: "arr[0]", value: "30" }
 ]);
 
-// 结果: {"x": 10, "y": 20, "arr": [30, 4]}
+// Result: {"x": 10, "y": 20, "arr": [30, 4]}
 ```
 
-### 修改字符串值
+### Modifying String Values
 
 ```js
 const source = '{"message": "Hello"}';
@@ -132,128 +132,128 @@ const result = replace(source, [
   { path: "message", value: '"World"' }
 ]);
 
-// 结果: {"message": "World"}
-// 注意：value 需要包含引号
+// Result: {"message": "World"}
+// Note: value needs to include quotes for strings
 ```
 
-### 修改复杂值
+### Modifying Complex Values
 
 ```js
 const source = '{"config": {"timeout": 3000}}';
 
-// 替换为对象
+// Replace with an object
 const result1 = replace(source, [
   { path: "config", value: '{"timeout": 5000, "retry": 3}' }
 ]);
 
-// 替换为数组
+// Replace with an array
 const result2 = replace(source, [
   { path: "config", value: '[1, 2, 3]' }
 ]);
 ```
 
-### 处理特殊字符的键名
+### Handling Special Characters in Keys
 
-使用 JSON Pointer 处理包含特殊字符的键名：
+Use JSON Pointer to handle keys with special characters:
 
 ```js
 const source = '{"a/b": {"c~d": 5}}';
 
-// 在 JSON Pointer 中：
-// ~0 表示 ~
-// ~1 表示 /
+// In JSON Pointer:
+// ~0 represents ~
+// ~1 represents /
 const result = replace(source, [
   { path: "/a~1b/c~0d", value: "42" }
 ]);
 
-// 结果: {"a/b": {"c~d": 42}}
+// Result: {"a/b": {"c~d": 42}}
 ```
 
-## 📚 API 文档
+## 📚 API Documentation
 
 ### `replace(sourceText, patches)`
 
-修改 JSON 字符串中的值。
+Modifies values in a JSON string.
 
-#### 参数
+#### Parameters
 
-- **sourceText** (`string`): 原始 JSON 字符串
-- **patches** (`Array<Patch>`): 要应用的修改数组
+- **sourceText** (`string`): The original JSON string
+- **patches** (`Array<Patch>`): Array of modifications to apply
 
-#### Patch 对象
+#### Patch Object
 
 ```typescript
 interface Patch {
-  path: string;    // 值的路径
-  value: string;   // 新值（字符串形式）
+  path: string;    // Path to the value
+  value: string;   // New value (as a string)
 }
 ```
 
-#### 路径语法
+#### Path Syntax
 
-支持两种路径语法：
+Two path syntaxes are supported:
 
-1. **点号路径**（推荐用于简单场景）
-   - 对象属性：`"user.name"`
-   - 数组索引：`"items[0]"`
-   - 嵌套路径：`"data.users[0].name"`
+1. **Dot Notation** (recommended for simple cases)
+   - Object properties: `"user.name"`
+   - Array indices: `"items[0]"`
+   - Nested paths: `"data.users[0].name"`
 
-2. **JSON Pointer**（RFC 6901）
-   - 格式：以 `/` 开头
-   - 对象属性：`"/user/name"`
-   - 数组索引：`"/items/0"`
-   - 转义字符：
-     - `~0` 表示 `~`
-     - `~1` 表示 `/`
-   - 示例：`"/a~1b/c~0d"` 表示 `a/b` 对象的 `c~d` 属性
+2. **JSON Pointer** (RFC 6901)
+   - Format: starts with `/`
+   - Object properties: `"/user/name"`
+   - Array indices: `"/items/0"`
+   - Escape sequences:
+     - `~0` represents `~`
+     - `~1` represents `/`
+   - Example: `"/a~1b/c~0d"` refers to the `c~d` property of the `a/b` object
 
-#### 值格式
+#### Value Format
 
-`value` 参数必须是字符串形式的 JSON 值：
+The `value` parameter must be a string representation of a JSON value:
 
-- 数字：`"42"`, `"3.14"`
-- 字符串：`'"hello"'` (需要包含引号)
-- 布尔值：`"true"`, `"false"`
-- null：`"null"`
-- 对象：`'{"key": "value"}'`
-- 数组：`'[1, 2, 3]'`
+- Numbers: `"42"`, `"3.14"`
+- Strings: `'"hello"'` (must include quotes)
+- Booleans: `"true"`, `"false"`
+- null: `"null"`
+- Objects: `'{"key": "value"}'`
+- Arrays: `'[1, 2, 3]'`
 
-#### 返回值
+#### Return Value
 
-返回修改后的 JSON 字符串。
+Returns the modified JSON string.
 
-#### 错误处理
+#### Error Handling
 
-- 如果路径不存在，该修改会被忽略，不会抛出错误
-- 如果多个修改的路径有冲突（重叠），会抛出错误
+- If a path doesn't exist, that modification is silently ignored without throwing an error
+- If multiple modifications have conflicting (overlapping) paths, an error is thrown
 
-## 🎯 应用场景
+## 🎯 Use Cases
 
-### 配置文件修改
+### Configuration File Modification
 
-适合修改带注释的配置文件（如 `tsconfig.json`、`package.json` 等）：
+Perfect for modifying configuration files with comments (like `tsconfig.json`, `package.json`, etc.):
 
 ```js
 import { readFileSync, writeFileSync } from 'fs';
 import { replace } from 'jsoncst';
 
-// 读取配置文件
+// Read configuration file
 const config = readFileSync('tsconfig.json', 'utf-8');
 
-// 修改配置
+// Modify configuration
 const updated = replace(config, [
   { path: "compilerOptions.target", value: '"ES2020"' },
   { path: "compilerOptions.strict", value: "true" }
 ]);
 
-// 保存配置（保留了原始格式和注释）
+// Save configuration (preserving original format and comments)
 writeFileSync('tsconfig.json', updated);
 ```
 
-### JSON 数据转换
+### JSON Data Transformation
 
 ```js
-// 批量更新 JSON 数据
+// Batch update JSON data
 const data = fetchDataAsString();
 
 const updated = replace(data, [
@@ -262,10 +262,10 @@ const updated = replace(data, [
 ]);
 ```
 
-### 自动化脚本
+### Automation Scripts
 
 ```js
-// 自动化更新版本号
+// Automated version number updates
 const pkg = readFileSync('package.json', 'utf-8');
 const version = '1.2.3';
 
@@ -276,9 +276,9 @@ const updated = replace(pkg, [
 writeFileSync('package.json', updated);
 ```
 
-## 💻 TypeScript 支持
+## 💻 TypeScript Support
 
-本包包含完整的 TypeScript 类型定义：
+The package includes full TypeScript type definitions:
 
 ```typescript
 import { replace } from "jsoncst";
@@ -296,72 +296,72 @@ const patches: Patch[] = [
 const result: string = replace(source, patches);
 ```
 
-## 🔧 工作原理
+## 🔧 How It Works
 
-jsoncst 使用具体语法树（CST, Concrete Syntax Tree）技术：
+jsoncst uses Concrete Syntax Tree (CST) technology:
 
-1. **词法分析**（Tokenizer）：将 JSON 字符串分解为 tokens，包括值、空白字符、注释等
-2. **语法分析**（CSTBuilder）：构建保留所有格式信息的语法树
-3. **路径解析**（PathResolver）：根据路径定位要修改的节点
-4. **精准替换**：仅替换目标值，保留其他所有内容
+1. **Tokenization** (Tokenizer): Breaks down the JSON string into tokens, including values, whitespace, and comments
+2. **Parsing** (CSTBuilder): Builds a syntax tree that preserves all formatting information
+3. **Path Resolution** (PathResolver): Locates the node to modify based on the path
+4. **Precise Replacement**: Replaces only the target value, preserving everything else
 
-这种方式确保了除了被修改的值以外，其他所有内容（包括空白字符、注释、格式）都保持不变。
+This approach ensures that everything except the modified values (including whitespace, comments, and formatting) remains unchanged.
 
-## ❓ 常见问题
+## ❓ FAQ
 
-### Q: 为什么 value 参数需要是字符串？
+### Q: Why does the value parameter need to be a string?
 
-A: 为了保持灵活性和精确性。你可以完全控制输出格式，包括引号、空格等。
+A: For flexibility and precision. You have complete control over the output format, including quotes, spacing, etc.
 
 ```js
-// 数字不需要引号
+// Numbers don't need quotes
 replace(source, [{ path: "age", value: "30" }]);
 
-// 字符串需要引号
+// Strings need quotes
 replace(source, [{ path: "name", value: '"Alice"' }]);
 
-// 可以控制格式
+// You can control formatting
 replace(source, [{ path: "data", value: '{\n  "key": "value"\n}' }]);
 ```
 
-### Q: 如何处理不存在的路径？
+### Q: How are non-existent paths handled?
 
-A: 如果路径不存在，该修改会被自动忽略，不会抛出错误，原字符串保持不变。
+A: If a path doesn't exist, that modification is automatically ignored without throwing an error. The original string remains unchanged.
 
-### Q: 支持哪些 JSON 扩展语法？
+### Q: What JSON extensions are supported?
 
-A: 支持：
-- ✅ 单行注释 `//`
-- ✅ 块注释 `/* */`
-- ✅ 所有标准 JSON 语法
+A: Supported:
+- ✅ Single-line comments `//`
+- ✅ Block comments `/* */`
+- ✅ All standard JSON syntax
 
-不支持：
-- ❌ JSON5 的其他特性（如无引号键名、尾随逗号等）
+Not supported:
+- ❌ Other JSON5 features (like unquoted keys, trailing commas, etc.)
 
-### Q: 性能如何？
+### Q: How is the performance?
 
-A: jsoncst 是专门为精准修改而设计的，性能优秀。对于大型文件（数百 KB），解析和修改通常在毫秒级完成。
+A: jsoncst is specifically designed for precise modifications with excellent performance. For large files (hundreds of KB), parsing and modification typically complete in milliseconds.
 
-## 🤝 贡献指南
+## 🤝 Contributing
 
-欢迎贡献！如果你想为项目做出贡献：
+Contributions are welcome! If you'd like to contribute to the project:
 
-1. Fork 本仓库
-2. 创建你的特性分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交你的更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 开启一个 Pull Request
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-## 📄 许可证
+## 📄 License
 
-本项目采用 [Anti 996 License](LICENSE) 许可证。
+This project is licensed under the [Anti 996 License](LICENSE).
 
-## 🔗 相关链接
+## 🔗 Links
 
-- [npm 包](https://www.npmjs.com/package/jsoncst)
-- [GitHub 仓库](https://github.com/axetroy/jsoncst)
-- [问题反馈](https://github.com/axetroy/jsoncst/issues)
+- [npm package](https://www.npmjs.com/package/jsoncst)
+- [GitHub repository](https://github.com/axetroy/jsoncst)
+- [Issue tracker](https://github.com/axetroy/jsoncst/issues)
 
 ## 🌟 Star History
 
-如果这个项目对你有帮助，请给它一个 ⭐️！
+If this project helps you, please give it a ⭐️!
