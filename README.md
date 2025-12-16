@@ -12,7 +12,7 @@ A utility to patch JSON strings while preserving the original formatting, includ
 -   🎨 **Format Preservation** - Maintains comments, whitespace, and original formatting
 -   🔄 **Precise Modifications** - Only changes specified values, leaving everything else intact
 -   🚀 **Fast & Lightweight** - Zero dependencies, minimal footprint
--   📦 **Zero Configuration** - Works out of the box with sensible defaults
+-   📦 **Dual module support** - Works with both ESM and CommonJS
 -   💪 **TypeScript Support** - Full type definitions included
 -   🎯 **Flexible Path Syntax** - Supports both dot notation and JSON Pointer
 
