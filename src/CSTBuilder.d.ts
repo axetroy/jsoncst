@@ -1,4 +1,4 @@
-import { Token } from "./Tokenizer";
+import { Token } from "./Tokenizer.js";
 
 interface NodePrimitives {
 	type: "String" | "Number" | "Boolean" | "Null";

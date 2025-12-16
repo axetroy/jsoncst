@@ -1,4 +1,4 @@
-import { Node } from "./CSTBuilder";
+import { Node } from "./CSTBuilder.js";
 
 type Path = string | Array<string>;
 
