@@ -1,9 +1,9 @@
-# jsoncst
+# json-codemod
 
 [![Badge](https://img.shields.io/badge/link-996.icu-%23FF4D5B.svg?style=flat-square)](https://996.icu/#/en_US)
 [![LICENSE](https://img.shields.io/badge/license-Anti%20996-blue.svg?style=flat-square)](https://github.com/996icu/996.ICU/blob/master/LICENSE)
 ![Node](https://img.shields.io/badge/node-%3E=14-blue.svg?style=flat-square)
-[![npm version](https://badge.fury.io/js/jsoncst.svg)](https://badge.fury.io/js/jsoncst)
+[![npm version](https://badge.fury.io/js/json-codemod.svg)](https://badge.fury.io/js/json-codemod)
 
 A utility to patch JSON strings while preserving the original formatting, including comments and whitespace.
 
@@ -19,15 +19,15 @@ A utility to patch JSON strings while preserving the original formatting, includ
 ## 📦 Installation
 
 ```bash
-npm install jsoncst
+npm install json-codemod
 ```
 
 Or using other package managers:
 
 ```bash
-yarn add jsoncst
+yarn add json-codemod
 # or
-pnpm add jsoncst
+pnpm add json-codemod
 ```
 
 ## 🚀 Quick Start
@@ -35,7 +35,7 @@ pnpm add jsoncst
 ### Basic Usage
 
 ```js
-import { replace } from "jsoncst";
+import { replace } from "json-codemod";
 
 const source = '{"name": "Alice", "age": 30}';
 
@@ -224,7 +224,7 @@ Perfect for modifying configuration files with comments (like `tsconfig.json`, `
 
 ```js
 import { readFileSync, writeFileSync } from "fs";
-import { replace } from "jsoncst";
+import { replace } from "json-codemod";
 
 // Read configuration file
 const config = readFileSync("tsconfig.json", "utf-8");
@@ -268,7 +268,7 @@ writeFileSync("package.json", updated);
 The package includes full TypeScript type definitions:
 
 ```typescript
-import { replace, Patch } from "jsoncst";
+import { replace, Patch } from "json-codemod";
 
 const source: string = '{"count": 0}';
 const patches: Patch[] = [{ path: "count", value: "1" }];
@@ -278,7 +278,7 @@ const result: string = replace(source, patches);
 
 ## 🔧 How It Works
 
-jsoncst uses Concrete Syntax Tree (CST) technology:
+json-codemod uses Concrete Syntax Tree (CST) technology:
 
 1. **Tokenization** (Tokenizer): Breaks down the JSON string into tokens, including values, whitespace, and comments
 2. **Parsing** (CSTBuilder): Builds a syntax tree that preserves all formatting information
@@ -322,7 +322,7 @@ Not supported:
 
 ### Q: How is the performance?
 
-A: jsoncst is specifically designed for precise modifications with excellent performance. For large files (hundreds of KB), parsing and modification typically complete in milliseconds.
+A: json-codemod is specifically designed for precise modifications with excellent performance. For large files (hundreds of KB), parsing and modification typically complete in milliseconds.
 
 ## 🤝 Contributing
 
@@ -340,9 +340,9 @@ This project is licensed under the [Anti 996 License](LICENSE).
 
 ## 🔗 Links
 
--   [npm package](https://www.npmjs.com/package/jsoncst)
--   [GitHub repository](https://github.com/axetroy/jsoncst)
--   [Issue tracker](https://github.com/axetroy/jsoncst/issues)
+-   [npm package](https://www.npmjs.com/package/json-codemod)
+-   [GitHub repository](https://github.com/axetroy/json-codemod)
+-   [Issue tracker](https://github.com/axetroy/json-codemod/issues)
 
 ## 🌟 Star History
 
