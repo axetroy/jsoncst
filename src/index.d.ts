@@ -1,6 +1,17 @@
-declare function replace(sourceText: string, patches: Array<{ path: string; value: string }>): string;
+interface Patch {
+	/**
+	 * A JSON path where the replacement should occur.
+	 */
+	path: string;
+	/**
+	 * The value to insert at the specified path.
+	 */
+	value: string;
+}
 
-export { replace };
+declare function replace(sourceText: string, patches: Array<Patch>): string;
+
+export { replace, Patch };
 
 interface JSONCTS {
 	replace: typeof replace;
