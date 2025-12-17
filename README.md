@@ -11,6 +11,7 @@ A utility to patch JSON strings while preserving the original formatting, includ
 
 -   🎨 **Format Preservation** - Maintains comments, whitespace, and original formatting
 -   🔄 **Precise Modifications** - Replace, delete, and insert values while leaving everything else intact
+-   ⚡ **Unified Patch API** - Apply multiple operations efficiently in a single call
 -   🚀 **Fast & Lightweight** - Zero dependencies, minimal footprint
 -   📦 **Dual module support** - Works with both ESM and CommonJS
 -   💪 **TypeScript Support** - Full type definitions included
@@ -31,6 +32,24 @@ pnpm add json-codemod
 ```
 
 ## 🚀 Quick Start
+
+### Using Patch (Recommended for Multiple Operations)
+
+```js
+import { patch } from "json-codemod";
+
+const source = '{"name": "Alice", "age": 30, "items": [1, 2]}';
+
+// Apply multiple operations at once (most efficient)
+const result = patch(source, [
+  { path: "age", value: "31" },              // Replace
+  { path: "name" },                          // Delete (no value means delete)
+  { path: "items", position: 2, value: "3" } // Insert
+]);
+
+console.log(result);
+// Output: {"age": 31, "items": [1, 2, 3]}
+```
 
 ### Replace Values
 
@@ -290,6 +309,50 @@ const result = replace(source, [{ path: "/a~1b/c~0d", value: "42" }]);
 ```
 
 ## 📚 API Documentation
+
+### `patch(sourceText, patches)` ⭐ Recommended
+
+Applies multiple operations (replace, delete, insert) in a single call. This is the most efficient way to apply multiple changes as it only parses the source once.
+
+#### Parameters
+
+-   **sourceText** (`string`): The original JSON string
+-   **patches** (`Array<ReplacePatch | DeletePatch | InsertPatch>`): Array of mixed operations to apply
+
+#### Patch Types
+
+The function automatically detects the operation type based on the patch properties:
+
+```typescript
+// Replace: has value but no key/position
+{ path: string, value: string }
+
+// Delete: no value, key, or position
+{ path: string }
+
+// Insert (object): has key and value
+{ path: string, key: string, value: string }
+
+// Insert (array): has position and value
+{ path: string, position: number, value: string }
+```
+
+#### Return Value
+
+Returns the modified JSON string with all patches applied.
+
+#### Example
+
+```js
+const result = patch('{"a": 1, "b": 2, "items": [1, 2]}', [
+  { path: "a", value: "10" },              // Replace
+  { path: "b" },                           // Delete
+  { path: "items", position: 2, value: "3" } // Insert
+]);
+// Returns: '{"a": 10, "items": [1, 2, 3]}'
+```
+
+---
 
 ### `replace(sourceText, patches)`
 
