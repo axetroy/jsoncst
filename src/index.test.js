@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { replace } from "./index.js";
+import { replace, remove, insert } from "./index.js";
 
 test("replace simple value", () => {
 	const source = '{"a":1,"b":true}';
@@ -188,4 +188,168 @@ test("replace with comments preserved", () => {
 }`;
 
 	assert.equal(replaced, expected);
+});
+
+// ===== DELETE OPERATION TESTS =====
+
+test("remove simple property from object", () => {
+const source = '{"a":1,"b":2,"c":3}';
+
+const result = remove(source, [{ path: "b" }]);
+
+assert.equal(result, '{"a":1,"c":3}');
+});
+
+test("remove first property from object", () => {
+const source = '{"a":1,"b":2,"c":3}';
+
+const result = remove(source, [{ path: "a" }]);
+
+assert.equal(result, '{"b":2,"c":3}');
+});
+
+test("remove last property from object", () => {
+const source = '{"a":1,"b":2,"c":3}';
+
+const result = remove(source, [{ path: "c" }]);
+
+assert.equal(result, '{"a":1,"b":2}');
+});
+
+test("remove array element", () => {
+const source = '{"arr":[1,2,3,4]}';
+
+const result = remove(source, [{ path: "arr[1]" }]);
+
+assert.equal(result, '{"arr":[1,3,4]}');
+});
+
+test("remove first array element", () => {
+const source = '{"arr":[1,2,3]}';
+
+const result = remove(source, [{ path: "arr[0]" }]);
+
+assert.equal(result, '{"arr":[2,3]}');
+});
+
+test("remove last array element", () => {
+const source = '{"arr":[1,2,3]}';
+
+const result = remove(source, [{ path: "arr[2]" }]);
+
+assert.equal(result, '{"arr":[1,2]}');
+});
+
+test("remove nested object property", () => {
+const source = '{"a":{"b":1,"c":2},"d":3}';
+
+const result = remove(source, [{ path: "a.b" }]);
+
+assert.equal(result, '{"a":{"c":2},"d":3}');
+});
+
+test("remove with JSON pointer", () => {
+const source = '{"a":{"b":[1,2,3]}}';
+
+const result = remove(source, [{ path: "/a/b/1" }]);
+
+assert.equal(result, '{"a":{"b":[1,3]}}');
+});
+
+test("remove multiple properties", () => {
+const source = '{"a":1,"b":2,"c":3,"d":4}';
+
+const result = remove(source, [{ path: "b" }, { path: "d" }]);
+
+assert.equal(result, '{"a":1,"c":3}');
+});
+
+test("remove with whitespace preservation", () => {
+const source = '{  "a"  :  1  ,  "b"  :  2  }';
+
+const result = remove(source, [{ path: "b" }]);
+
+assert.equal(result, '{  "a"  :  1  }');
+});
+
+test("remove non-existing property", () => {
+const source = '{"a":1,"b":2}';
+
+const result = remove(source, [{ path: "c" }]);
+
+assert.equal(result, '{"a":1,"b":2}');
+});
+
+// ===== INSERT OPERATION TESTS =====
+
+test("insert property into object", () => {
+const source = '{"a":1,"b":2}';
+
+const result = insert(source, [{ path: "", key: "c", value: "3" }]);
+
+assert.equal(result, '{"a":1,"b":2, "c": 3}');
+});
+
+test("insert into empty object", () => {
+const source = '{}';
+
+const result = insert(source, [{ path: "", key: "a", value: "1" }]);
+
+assert.equal(result, '{"a": 1}');
+});
+
+test("insert element at start of array", () => {
+const source = '{"arr":[2,3,4]}';
+
+const result = insert(source, [{ path: "arr", position: 0, value: "1" }]);
+
+assert.equal(result, '{"arr":[1, 2,3,4]}');
+});
+
+test("insert element at end of array", () => {
+const source = '{"arr":[1,2,3]}';
+
+const result = insert(source, [{ path: "arr", position: 3, value: "4" }]);
+
+assert.equal(result, '{"arr":[1,2,3, 4]}');
+});
+
+test("insert element in middle of array", () => {
+const source = '{"arr":[1,3,4]}';
+
+const result = insert(source, [{ path: "arr", position: 1, value: "2" }]);
+
+assert.equal(result, '{"arr":[1,2, 3,4]}');
+});
+
+test("insert into empty array", () => {
+const source = '{"arr":[]}';
+
+const result = insert(source, [{ path: "arr", position: 0, value: "1" }]);
+
+assert.equal(result, '{"arr":[1]}');
+});
+
+test("insert without position appends to array", () => {
+const source = '{"arr":[1,2,3]}';
+
+const result = insert(source, [{ path: "arr", value: "4" }]);
+
+assert.equal(result, '{"arr":[1,2,3, 4]}');
+});
+
+test("insert nested object property", () => {
+const source = '{"a":{"b":1}}';
+
+const result = insert(source, [{ path: "a", key: "c", value: "2" }]);
+
+assert.equal(result, '{"a":{"b":1, "c": 2}}');
+});
+
+test("insert with JSON pointer", () => {
+const source = '{"a":{"arr":[1,2]}}';
+
+const result = insert(source, [{ path: "/a/arr", position: 1, value: "99" }]);
+
+assert.equal(result, '{"a":{"arr":[1,99, 2]}}');
 });
