@@ -47,8 +47,8 @@ function remove(sourceText, patches) {
 	const builder = new CSTBuilder(tokens);
 	const root = builder.build();
 
-	// 倒叙删除
-	const reverseNodes = patches
+	// Collect delete operations with their positions
+	const deleteOps = patches
 		.map((patch) => {
 			const pathParts = parsePath(patch.path);
 			if (pathParts.length === 0) {
@@ -62,24 +62,23 @@ function remove(sourceText, patches) {
 
 			if (!parentNode) return null;
 
+			// Get the actual range to delete
+			const deleteRange = getDeleteRange(parentNode, lastKey, sourceText);
+			if (!deleteRange) return null;
+
 			return {
-				parentNode,
-				lastKey,
-				patch,
+				start: deleteRange.start,
+				end: deleteRange.end,
 			};
 		})
 		.filter((v) => v !== null)
-		.sort((a, b) => {
-			// Sort by the start position of what we're deleting
-			const aStart = getDeleteStart(a.parentNode, a.lastKey, sourceText);
-			const bStart = getDeleteStart(b.parentNode, b.lastKey, sourceText);
-			return bStart - aStart;
-		});
+		.sort((a, b) => b.start - a.start); // Sort in reverse order
 
 	let result = sourceText;
 
-	for (const { parentNode, lastKey } of reverseNodes) {
-		result = deleteFromParent(result, parentNode, lastKey, sourceText);
+	// Apply deletions in reverse order
+	for (const { start, end } of deleteOps) {
+		result = result.slice(0, start) + result.slice(end);
 	}
 
 	return result;
@@ -147,10 +146,12 @@ function parseDotPath(path) {
 		}
 
 		let name = "";
-		while (i < path.length && /[a-zA-Z0-9_$]/.test(path[i])) {
+		while (i < path.length && /[a-zA-Z0-9_$-]/.test(path[i])) {
 			name += path[i++];
 		}
-		result.push(name);
+		if (name) {
+			result.push(name);
+		}
 	}
 
 	return result;
@@ -172,59 +173,26 @@ function parseJSONPointer(pointer) {
 		});
 }
 
-function getDeleteStart(parentNode, key, sourceText) {
+function getDeleteRange(parentNode, key, sourceText) {
 	if (parentNode.type === "Object") {
-		for (const prop of parentNode.properties) {
-			const keyStr = extractString(prop.key, sourceText);
-			if (keyStr === key) {
-				return prop.key.start;
-			}
-		}
+		return getObjectPropertyDeleteRange(parentNode, key, sourceText);
 	} else if (parentNode.type === "Array") {
-		if (typeof key === "number" && key >= 0 && key < parentNode.elements.length) {
-			return parentNode.elements[key].start;
-		}
+		return getArrayElementDeleteRange(parentNode, key, sourceText);
 	}
-	return 0;
+	return null;
 }
 
-function extractString(stringNode, sourceText) {
-	const raw = sourceText.slice(stringNode.start + 1, stringNode.end - 1);
-	return raw.replace(/\\(.)/g, (_, ch) => {
-		switch (ch) {
-			case '"': return '"';
-			case "\\": return "\\";
-			case "/": return "/";
-			case "b": return "\b";
-			case "f": return "\f";
-			case "n": return "\n";
-			case "r": return "\r";
-			case "t": return "\t";
-			default: return ch;
-		}
-	});
-}
-
-function deleteFromParent(sourceText, parentNode, key, originalSource) {
-	if (parentNode.type === "Object") {
-		return deleteObjectProperty(sourceText, parentNode, key, originalSource);
-	} else if (parentNode.type === "Array") {
-		return deleteArrayElement(sourceText, parentNode, key, originalSource);
-	}
-	return sourceText;
-}
-
-function deleteObjectProperty(sourceText, objectNode, key, originalSource) {
+function getObjectPropertyDeleteRange(objectNode, key, sourceText) {
 	let propIndex = -1;
 	for (let i = 0; i < objectNode.properties.length; i++) {
-		const keyStr = extractString(objectNode.properties[i].key, originalSource);
+		const keyStr = extractString(objectNode.properties[i].key, sourceText);
 		if (keyStr === key) {
 			propIndex = i;
 			break;
 		}
 	}
 
-	if (propIndex === -1) return sourceText;
+	if (propIndex === -1) return null;
 
 	const prop = objectNode.properties[propIndex];
 	let deleteStart = prop.key.start;
@@ -262,12 +230,12 @@ function deleteObjectProperty(sourceText, objectNode, key, originalSource) {
 		}
 	}
 
-	return sourceText.slice(0, deleteStart) + sourceText.slice(deleteEnd);
+	return { start: deleteStart, end: deleteEnd };
 }
 
-function deleteArrayElement(sourceText, arrayNode, index, originalSource) {
+function getArrayElementDeleteRange(arrayNode, index, sourceText) {
 	if (typeof index !== "number" || index < 0 || index >= arrayNode.elements.length) {
-		return sourceText;
+		return null;
 	}
 
 	const element = arrayNode.elements[index];
@@ -306,7 +274,24 @@ function deleteArrayElement(sourceText, arrayNode, index, originalSource) {
 		}
 	}
 
-	return sourceText.slice(0, deleteStart) + sourceText.slice(deleteEnd);
+	return { start: deleteStart, end: deleteEnd };
+}
+
+function extractString(stringNode, sourceText) {
+	const raw = sourceText.slice(stringNode.start + 1, stringNode.end - 1);
+	return raw.replace(/\\(.)/g, (_, ch) => {
+		switch (ch) {
+			case '"': return '"';
+			case "\\": return "\\";
+			case "/": return "/";
+			case "b": return "\b";
+			case "f": return "\f";
+			case "n": return "\n";
+			case "r": return "\r";
+			case "t": return "\t";
+			default: return ch;
+		}
+	});
 }
 
 function insertIntoNode(sourceText, node, patch, originalSource) {
