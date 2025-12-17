@@ -19,6 +19,13 @@ export function resolvePath(root, path, sourceText) {
 	return node;
 }
 
+/**
+ *
+ * @param {import('./CSTBuilder.js').NodeObject} objectNode
+ * @param {string} key
+ * @param {string} sourceText
+ * @returns {import('./CSTBuilder.js').Node | null}
+ */
 function resolveObjectProperty(objectNode, key, sourceText) {
 	if (typeof key !== "string") return null;
 
@@ -31,6 +38,12 @@ function resolveObjectProperty(objectNode, key, sourceText) {
 	return null;
 }
 
+/**
+ *
+ * @param {import('./CSTBuilder.js').NodeArray} arrayNode
+ * @param {number} index
+ * @returns {import('./CSTBuilder.js').Node | null}
+ */
 function resolveArrayElement(arrayNode, index) {
 	if (typeof index !== "number") return null;
 	return arrayNode.elements[index] || null;
