@@ -1,20 +1,14 @@
-interface Patch {
-	/**
-	 * A JSON path where the replacement should occur.
-	 */
-	path: string;
-	/**
-	 * The value to insert at the specified path.
-	 */
-	value: string;
-}
+import { replace, ReplacePatch } from "./function/replace.js";
+import { remove, DeletePatch } from "./function/delete.js";
+import { insert, InsertPatch } from "./function/insert.js";
+import { batch, BatchPatch } from "./function/batch.js";
 
-declare function replace(sourceText: string, patches: Array<Patch>): string;
-
-export { replace, Patch };
-
+export { ReplacePatch, DeletePatch, InsertPatch, BatchPatch, replace, remove, insert, batch };
 interface JSONCTS {
 	replace: typeof replace;
+	remove: typeof remove;
+	insert: typeof insert;
+	batch: typeof batch;
 }
 
 declare const jsoncts: JSONCTS;
