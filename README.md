@@ -36,15 +36,15 @@ pnpm add json-codemod
 ### Using Patch (Recommended for Multiple Operations)
 
 ```js
-import { patch } from "json-codemod";
+import { batch } from "json-codemod";
 
 const source = '{"name": "Alice", "age": 30, "items": [1, 2]}';
 
 // Apply multiple operations at once (most efficient)
-const result = patch(source, [
-  { path: "age", value: "31" },              // Replace
-  { path: "name" },                          // Delete (no value means delete)
-  { path: "items", position: 2, value: "3" } // Insert
+const result = batch(source, [
+	{ path: "age", value: "31" }, // Replace
+	{ path: "name" }, // Delete (no value means delete)
+	{ path: "items", position: 2, value: "3" }, // Insert
 ]);
 
 console.log(result);
@@ -310,7 +310,7 @@ const result = replace(source, [{ path: "/a~1b/c~0d", value: "42" }]);
 
 ## 📚 API Documentation
 
-### `patch(sourceText, patches)` ⭐ Recommended
+### `batch(sourceText, patches)` ⭐ Recommended
 
 Applies multiple operations (replace, delete, insert) in a single call. This is the most efficient way to apply multiple changes as it only parses the source once.
 
@@ -319,9 +319,9 @@ Applies multiple operations (replace, delete, insert) in a single call. This is 
 -   **sourceText** (`string`): The original JSON string
 -   **patches** (`Array<ReplacePatch | DeletePatch | InsertPatch>`): Array of mixed operations to apply
 
-#### Patch Types
+#### Batch Types
 
-The function automatically detects the operation type based on the patch properties:
+The function automatically detects the operation type based on the batch properties:
 
 ```typescript
 // Replace: has value but no key/position
@@ -344,10 +344,10 @@ Returns the modified JSON string with all patches applied.
 #### Example
 
 ```js
-const result = patch('{"a": 1, "b": 2, "items": [1, 2]}', [
-  { path: "a", value: "10" },              // Replace
-  { path: "b" },                           // Delete
-  { path: "items", position: 2, value: "3" } // Insert
+const result = batch('{"a": 1, "b": 2, "items": [1, 2]}', [
+	{ path: "a", value: "10" }, // Replace
+	{ path: "b" }, // Delete
+	{ path: "items", position: 2, value: "3" }, // Insert
 ]);
 // Returns: '{"a": 10, "items": [1, 2, 3]}'
 ```
@@ -530,14 +530,10 @@ import { insert, remove } from "json-codemod";
 const pkg = readFileSync("package.json", "utf-8");
 
 // Add a new dependency
-const withNewDep = insert(pkg, [
-	{ path: "dependencies", key: "lodash", value: '"^4.17.21"' }
-]);
+const withNewDep = insert(pkg, [{ path: "dependencies", key: "lodash", value: '"^4.17.21"' }]);
 
 // Remove a dependency
-const cleaned = remove(pkg, [
-	{ path: "dependencies.old-package" }
-]);
+const cleaned = remove(pkg, [{ path: "dependencies.old-package" }]);
 
 writeFileSync("package.json", cleaned);
 ```
@@ -562,14 +558,10 @@ import { insert, remove } from "json-codemod";
 const data = '{"tasks": ["task1", "task2", "task4"]}';
 
 // Insert a task in the middle
-const withTask = insert(data, [
-	{ path: "tasks", position: 2, value: '"task3"' }
-]);
+const withTask = insert(data, [{ path: "tasks", position: 2, value: '"task3"' }]);
 
 // Remove a completed task
-const updated = remove(withTask, [
-	{ path: "tasks[0]" }
-]);
+const updated = remove(withTask, [{ path: "tasks[0]" }]);
 ```
 
 ### Automation Scripts
@@ -602,9 +594,7 @@ const deletePatches: DeletePatch[] = [{ path: "count" }];
 const deleted: string = remove(source, deletePatches);
 
 // Insert
-const insertPatches: InsertPatch[] = [
-	{ path: "", key: "name", value: '"example"' }
-];
+const insertPatches: InsertPatch[] = [{ path: "", key: "name", value: '"example"' }];
 const inserted: string = insert(source, insertPatches);
 ```
 

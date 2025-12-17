@@ -1,7 +1,7 @@
 import test, { describe } from "node:test";
 import assert from "node:assert/strict";
 
-import { replace, remove, insert, patch } from "./index.js";
+import { replace, remove, insert, batch } from "./index.js";
 
 // ===== REPLACE OPERATION TESTS =====
 describe("Replace Operation Tests", () => {
@@ -359,117 +359,113 @@ describe("Insert Operation Tests", () => {
 	});
 });
 
-// ===== PATCH OPERATION TESTS =====
-describe("Patch Operation Tests", () => {
-test("patch with mixed operations", () => {
-const source = '{"a": 1, "b": 2, "c": [1, 2, 3]}';
+// ===== BATCH OPERATION TESTS =====
+describe("Batch Operation Tests", () => {
+	test("batch with mixed operations", () => {
+		const source = '{"a": 1, "b": 2, "c": [1, 2, 3]}';
 
-const result = patch(source, [
-{ path: "a", value: "10" },              // Replace
-{ path: "b" },                           // Delete
-{ path: "c", position: 1, value: "99" }  // Insert
-]);
+		const result = batch(source, [
+			{ path: "a", value: "10" }, // Replace
+			{ path: "b" }, // Delete
+			{ path: "c", position: 1, value: "99" }, // Insert
+		]);
 
-assert.equal(result, '{"a": 10, "c": [1, 99, 2, 3]}');
-});
+		assert.equal(result, '{"a": 10, "c": [1, 99, 2, 3]}');
+	});
 
-test("patch with only replacements", () => {
-const source = '{"x": 1, "y": 2}';
+	test("batch with only replacements", () => {
+		const source = '{"x": 1, "y": 2}';
 
-const result = patch(source, [
-{ path: "x", value: "100" },
-{ path: "y", value: "200" }
-]);
+		const result = batch(source, [
+			{ path: "x", value: "100" },
+			{ path: "y", value: "200" },
+		]);
 
-assert.equal(result, '{"x": 100, "y": 200}');
-});
+		assert.equal(result, '{"x": 100, "y": 200}');
+	});
 
-test("patch with only deletions", () => {
-const source = '{"a": 1, "b": 2, "c": 3}';
+	test("batch with only deletions", () => {
+		const source = '{"a": 1, "b": 2, "c": 3}';
 
-const result = patch(source, [
-{ path: "b" }
-]);
+		const result = batch(source, [{ path: "b" }]);
 
-assert.equal(result, '{"a": 1, "c": 3}');
-});
+		assert.equal(result, '{"a": 1, "c": 3}');
+	});
 
-test("patch with only insertions", () => {
-const source = '{"items": [1, 3]}';
+	test("batch with only insertions", () => {
+		const source = '{"items": [1, 3]}';
 
-const result = patch(source, [
-{ path: "items", position: 1, value: "2" }
-]);
+		const result = batch(source, [{ path: "items", position: 1, value: "2" }]);
 
-assert.equal(result, '{"items": [1, 2, 3]}');
-});
+		assert.equal(result, '{"items": [1, 2, 3]}');
+	});
 
-test("patch with object operations", () => {
-const source = '{"user": {"name": "Alice", "age": 30}}';
+	test("batch with object operations", () => {
+		const source = '{"user": {"name": "Alice", "age": 30}}';
 
-const result = patch(source, [
-{ path: "user.name", value: '"Bob"' },                       // Replace
-{ path: "user.age" },                                        // Delete
-{ path: "user", key: "email", value: '"bob@example.com"' }  // Insert
-]);
+		const result = batch(source, [
+			{ path: "user.name", value: '"Bob"' }, // Replace
+			{ path: "user.age" }, // Delete
+			{ path: "user", key: "email", value: '"bob@example.com"' }, // Insert
+		]);
 
-assert.equal(result, '{"user": {"name": "Bob", "email": "bob@example.com"}}');
-});
+		assert.equal(result, '{"user": {"name": "Bob", "email": "bob@example.com"}}');
+	});
 
-test("patch with nested operations", () => {
-const source = '{"data": {"items": [1, 2, 3], "count": 3}}';
+	test("batch with nested operations", () => {
+		const source = '{"data": {"items": [1, 2, 3], "count": 3}}';
 
-const result = patch(source, [
-{ path: "data.count", value: "4" },           // Replace
-{ path: "data.items", position: 3, value: "4" }  // Insert
-]);
+		const result = batch(source, [
+			{ path: "data.count", value: "4" }, // Replace
+			{ path: "data.items", position: 3, value: "4" }, // Insert
+		]);
 
-assert.equal(result, '{"data": {"items": [1, 2, 3, 4], "count": 4}}');
-});
+		assert.equal(result, '{"data": {"items": [1, 2, 3, 4], "count": 4}}');
+	});
 
-test("patch with empty patches array", () => {
-const source = '{"a": 1}';
+	test("batch with empty patches array", () => {
+		const source = '{"a": 1}';
 
-const result = patch(source, []);
+		const result = batch(source, []);
 
-assert.equal(result, '{"a": 1}');
-});
+		assert.equal(result, '{"a": 1}');
+	});
 
-test("patch preserves formatting", () => {
-const source = `{
+	test("batch preserves formatting", () => {
+		const source = `{
   "name": "Alice",
   "age": 30,
   "items": [1, 2]
 }`;
 
-const result = patch(source, [
-{ path: "age", value: "31" },
-{ path: "items", position: 2, value: "3" }
-]);
+		const result = batch(source, [
+			{ path: "age", value: "31" },
+			{ path: "items", position: 2, value: "3" },
+		]);
 
-const expected = `{
+		const expected = `{
   "name": "Alice",
   "age": 31,
   "items": [1, 2, 3]
 }`;
 
-assert.equal(result, expected);
-});
+		assert.equal(result, expected);
+	});
 
-test("patch with comments preserved", () => {
-const source = `{
+	test("batch with comments preserved", () => {
+		const source = `{
   // User info
   "name": "Alice",
   "age": 30
 }`;
 
-const result = patch(source, [
-{ path: "age", value: "31" },
-{ path: "", key: "email", value: '"alice@example.com"' }
-]);
+		const result = batch(source, [
+			{ path: "age", value: "31" },
+			{ path: "", key: "email", value: '"alice@example.com"' },
+		]);
 
-assert(result.includes('// User info'));
-assert(result.includes('"age": 31'));
-assert(result.includes('"email": "alice@example.com"'));
-});
+		assert(result.includes("// User info"));
+		assert(result.includes('"age": 31'));
+		assert(result.includes('"email": "alice@example.com"'));
+	});
 });

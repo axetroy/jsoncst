@@ -4,10 +4,12 @@ exports[`test cjs output 1`] = `
 > node index.cjs
 
 {
+  batch: [Function: batch],
   default: {
     replace: [Function: replace],
     remove: [Function: remove],
-    insert: [Function: insert]
+    insert: [Function: insert],
+    batch: [Function: batch]
   },
   insert: [Function: insert],
   remove: [Function: remove],
@@ -24,7 +26,8 @@ exports[`test esm output 1`] = `
 {
   replace: [Function: replace],
   remove: [Function: remove],
-  insert: [Function: insert]
+  insert: [Function: insert],
+  batch: [Function: batch]
 } [Function: replace]
 
 `;
