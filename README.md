@@ -366,7 +366,7 @@ Modifies values in a JSON string.
 #### Patch Object
 
 ```typescript
-interface Patch {
+interface ReplacePatch {
 	/**
 	 * A JSON path where the replacement should occur.
 	 */
