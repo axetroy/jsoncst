@@ -9,10 +9,8 @@ exports[`test cjs output 1`] = `
     replace: [Function: replace],
     remove: [Function: remove],
     insert: [Function: insert],
-    batch: [Function: batch],
-    formatValue: [Function: formatValue]
+    batch: [Function: batch]
   },
-  formatValue: [Function: formatValue],
   insert: [Function: insert],
   remove: [Function: remove],
   replace: [Function: replace]
@@ -29,8 +27,7 @@ exports[`test esm output 1`] = `
   replace: [Function: replace],
   remove: [Function: remove],
   insert: [Function: insert],
-  batch: [Function: batch],
-  formatValue: [Function: formatValue]
+  batch: [Function: batch]
 } [Function: replace]
 
 `;
