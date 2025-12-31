@@ -33,10 +33,10 @@ test("test esm output", () => {
 
 	const outputStr = output.toString();
 	// Check that the output contains the expected exports
-	// The default export is now jsonmod function
+	// The default export is jsonmod function
 	assert.match(outputStr, /\[Function: jsonmod\]/);
-	// Named export replace is still available
-	assert.match(outputStr, /\[Function:.*replace.*\]/);
+	// formatValue is available as named export
+	assert.match(outputStr, /\[Function:.*formatValue.*\]/);
 });
 
 test("test cjs output", () => {
@@ -55,13 +55,6 @@ test("test cjs output", () => {
 
 	const outputStr = output.toString();
 	// Check that the output contains the expected exports
-	assert.match(outputStr, /replace:.*\[Function:.*replace.*\]/);
-	assert.match(outputStr, /remove:.*\[Function:.*remove.*\]/);
-	assert.match(outputStr, /insert:.*\[Function:.*insert.*\]/);
-	assert.match(outputStr, /batch:.*\[Function:.*batch.*\]/);
-	assert.match(outputStr, /formatValue:.*\[Function:.*formatValue.*\]/);
-	assert.match(outputStr, /jsonmod:.*\[Function: jsonmod\]/);
-	assert.match(outputStr, /JsonMod:.*\[Function: JsonMod\]/);
-	// Check default export
-	assert.match(outputStr, /default:.*\[Function: jsonmod\]/);
+	assert.match(outputStr, /\[Function: jsonmod\]/);
+	assert.match(outputStr, /\[Function:.*formatValue.*\]/);
 });

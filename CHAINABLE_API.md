@@ -115,30 +115,6 @@ const result = jsonmod(source)
   .apply();  // Executes all operations
 ```
 
-## Migration from Old API
-
-### Old Functional API (Still Supported)
-
-```javascript
-import { batch } from "json-codemod";
-
-const result = batch(source, [
-  { operation: "replace", path: "a", value: "10" },
-  { operation: "delete", path: "b" },
-]);
-```
-
-### New Chainable API (Recommended)
-
-```javascript
-import jsonmod from "json-codemod";
-
-const result = jsonmod(source)
-  .replace("a", "10")
-  .delete("b")
-  .apply();
-```
-
 ## Advanced Examples
 
 ### Complex Nested Operations
@@ -205,21 +181,6 @@ const result: string = instance
   .apply();
 ```
 
-## Backward Compatibility
-
-The old functional API (`replace`, `remove`, `insert`, `batch`) remains fully supported:
-
-```javascript
-import { replace, remove, insert, batch, formatValue } from "json-codemod";
-
-// All old APIs still work
-const result1 = replace(source, [{ path: "a", value: "1" }]);
-const result2 = remove(source, [{ path: "b" }]);
-const result3 = batch(source, [
-  { operation: "replace", path: "c", value: "3" }
-]);
-```
-
 ## Performance
 
 Operations are applied sequentially, re-parsing after each operation. This ensures:
@@ -227,10 +188,6 @@ Operations are applied sequentially, re-parsing after each operation. This ensur
 - Predictable behavior
 - Format preservation
 
-For best performance with many operations on independent paths, consider the `batch()` function from the old API.
-
 ## See Also
 
 - [Main README](../README.md)
-- [API Improvements](./API_IMPROVEMENTS.md)
-- [Migration Guide](./MIGRATION.md)
