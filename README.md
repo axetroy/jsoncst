@@ -10,7 +10,7 @@ Modify JSON strings with a fluent chainable API while preserving formatting, com
 ## ✨ Features
 
 -   🎨 **Format Preservation** - Maintains comments, whitespace, and original formatting
--   🔗 **Chainable API** - Fluent interface for readable modifications  
+-   🔗 **Chainable API** - Fluent interface for readable modifications
 -   ⚡ **Sequential Operations** - Apply multiple changes in order
 -   🚀 **Fast & Lightweight** - Zero dependencies, minimal footprint
 -   📦 **Dual module support** - Works with both ESM and CommonJS
@@ -261,7 +261,7 @@ const source = '{"items": [1, 2, 3, 4, 5]}';
 
 const result = jsonmod(source)
   .delete("items[1]")      // Remove second item
-  .delete("items[2]")      // Remove what is now third item  
+  .delete("items[2]")      // Remove what is now third item
   .insert("items", 0, "0") // Insert at beginning
   .apply();
 
@@ -313,7 +313,7 @@ For keys with special characters, use JSON Pointer:
 // Key with slash: "a/b"
 jsonmod(source).replace("/a~1b", "value").apply();
 
-// Key with tilde: "a~b"  
+// Key with tilde: "a~b"
 jsonmod(source).replace("/a~0b", "value").apply();
 ```
 

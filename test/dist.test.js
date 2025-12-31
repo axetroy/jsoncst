@@ -1,7 +1,6 @@
 import test, { before } from "node:test";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import assert from "node:assert/strict";
 
 import { execSync } from "node:child_process";
 
@@ -17,7 +16,7 @@ before(() => {
 	});
 });
 
-test("test esm output", () => {
+test("test esm output", (t) => {
 	const targetDir = path.join(rootDir, "fixtures", "esm");
 
 	execSync("yarn", { cwd: targetDir, stdio: "inherit" });
@@ -31,15 +30,12 @@ test("test esm output", () => {
 		},
 	});
 
-	const outputStr = output.toString();
-	// Check that the output contains the expected exports
-	// The default export is jsonmod function
-	assert.match(outputStr, /\[Function: jsonmod\]/);
-	// formatValue is available as named export
-	assert.match(outputStr, /\[Function:.*formatValue.*\]/);
+	t.assert.snapshot(output.toString(), {
+		serializers: [(value) => value],
+	});
 });
 
-test("test cjs output", () => {
+test("test cjs output", (t) => {
 	const targetDir = path.join(rootDir, "fixtures", "cjs");
 
 	execSync("yarn", { cwd: targetDir, stdio: "inherit" });
@@ -53,8 +49,7 @@ test("test cjs output", () => {
 		},
 	});
 
-	const outputStr = output.toString();
-	// Check that the output contains the expected exports
-	assert.match(outputStr, /\[Function: jsonmod\]/);
-	assert.match(outputStr, /\[Function:.*formatValue.*\]/);
+	t.assert.snapshot(output.toString(), {
+		serializers: [(value) => value],
+	});
 });
