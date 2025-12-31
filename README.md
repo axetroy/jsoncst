@@ -33,7 +33,49 @@ pnpm add json-codemod
 
 ## 🚀 Quick Start
 
-### Using Patch (Recommended for Multiple Operations)
+### Using Value Helpers (New! Recommended)
+
+Value helpers make it easier to format values correctly without manual quote handling:
+
+```js
+import { replace, formatValue } from "json-codemod";
+
+const source = '{"name": "Alice", "age": 30, "active": false}';
+
+// Use formatValue to automatically handle any type
+const result = replace(source, [
+	{ path: "name", value: formatValue("Bob") }, // Strings get quotes
+	{ path: "age", value: formatValue(31) }, // Numbers don't
+	{ path: "active", value: formatValue(true) }, // Booleans work too
+]);
+
+console.log(result);
+// Output: {"name": "Bob", "age": 31, "active": true}
+```
+
+See [API_IMPROVEMENTS.md](./API_IMPROVEMENTS.md) for more details on the new features.
+
+### Using Batch with Explicit Operations (New! Recommended)
+
+For better code clarity, you can now use explicit operation types:
+
+```js
+import { batch, formatValue } from "json-codemod";
+
+const source = '{"name": "Alice", "age": 30, "items": [1, 2]}';
+
+// Use explicit operation types for self-documenting code
+const result = batch(source, [
+	{ operation: "replace", path: "age", value: formatValue(31) },
+	{ operation: "delete", path: "name" },
+	{ operation: "insert", path: "items", position: 2, value: formatValue(3) },
+]);
+
+console.log(result);
+// Output: {"age": 31, "items": [1, 2, 3]}
+```
+
+### Using Patch (Multiple Operations)
 
 ```js
 import { batch } from "json-codemod";
@@ -41,6 +83,7 @@ import { batch } from "json-codemod";
 const source = '{"name": "Alice", "age": 30, "items": [1, 2]}';
 
 // Apply multiple operations at once (most efficient)
+// Implicit operation detection (backward compatible)
 const result = batch(source, [
 	{ path: "age", value: "31" }, // Replace
 	{ path: "name" }, // Delete (no value means delete)
@@ -321,7 +364,22 @@ Applies multiple operations (replace, delete, insert) in a single call. This is 
 
 #### Batch Types
 
-The function automatically detects the operation type based on the batch properties:
+The function supports both **implicit** (backward compatible) and **explicit** operation types:
+
+**Explicit Operation Types** (⭐ Recommended for clarity):
+
+```typescript
+// Replace: explicit operation type
+{ operation: "replace", path: string, value: string }
+
+// Delete: explicit operation type (both "delete" and "remove" are supported)
+{ operation: "delete" | "remove", path: string }
+
+// Insert: explicit operation type
+{ operation: "insert", path: string, value: string, key?: string, position?: number }
+```
+
+**Implicit Operation Detection** (backward compatible):
 
 ```typescript
 // Replace: has value but no key/position
@@ -342,6 +400,21 @@ The function automatically detects the operation type based on the batch propert
 Returns the modified JSON string with all patches applied.
 
 #### Example
+
+**With Explicit Operations** (Recommended):
+
+```js
+import { batch, formatValue } from "json-codemod";
+
+const result = batch('{"a": 1, "b": 2, "items": [1, 2]}', [
+	{ operation: "replace", path: "a", value: formatValue(10) },
+	{ operation: "delete", path: "b" },
+	{ operation: "insert", path: "items", position: 2, value: formatValue(3) },
+]);
+// Returns: '{"a": 10, "items": [1, 2, 3]}'
+```
+
+**With Implicit Detection** (Backward Compatible):
 
 ```js
 const result = batch('{"a": 1, "b": 2, "items": [1, 2]}', [
@@ -465,6 +538,62 @@ Returns the modified JSON string with new values inserted.
 -   For object insertions, `key` is required
 -   For object insertions, if the key already exists, an error is thrown
 -   For array insertions, position must be within valid bounds (0 to array.length)
+
+---
+
+### Value Helpers ⭐ New!
+
+Helper utilities to format values correctly without manual quote handling. These make the API more intuitive and less error-prone.
+
+#### `formatValue(value)`
+
+Formats any JavaScript value into a JSON string representation.
+
+```js
+import { formatValue } from "json-codemod";
+
+formatValue(42); // "42"
+formatValue("hello"); // '"hello"'
+formatValue(true); // "true"
+formatValue(null); // "null"
+formatValue({ a: 1 }); // '{"a":1}'
+formatValue([1, 2, 3]); // '[1,2,3]'
+```
+
+#### Type-Specific Helpers
+
+For convenience, type-specific helpers are also available:
+
+```js
+import { string, number, boolean, nullValue, object, array } from "json-codemod";
+
+string("hello"); // '"hello"'
+number(42); // "42"
+boolean(true); // "true"
+nullValue(); // "null"
+object({ a: 1 }); // '{"a":1}'
+array([1, 2, 3]); // '[1,2,3]'
+```
+
+#### Usage Example
+
+```js
+import { replace, formatValue } from "json-codemod";
+
+const source = '{"user": {"name": "Alice", "age": 30}}';
+
+// Without helpers (manual quote handling)
+replace(source, [
+	{ path: "user.name", value: '"Bob"' }, // Easy to forget quotes
+	{ path: "user.age", value: "31" },
+]);
+
+// With helpers (automatic quote handling)
+replace(source, [
+	{ path: "user.name", value: formatValue("Bob") }, // Automatic
+	{ path: "user.age", value: formatValue(31) },
+]);
+```
 
 ---
 
@@ -611,16 +740,61 @@ This approach ensures that everything except the modified values (including whit
 
 ## ❓ FAQ
 
+### Q: Should I use value helpers or manual string formatting?
+
+A: **Value helpers are recommended** for most use cases as they eliminate common mistakes:
+
+```js
+// ❌ Manual formatting (error-prone)
+replace(source, [
+	{ path: "name", value: '"Alice"' }, // Easy to forget quotes
+	{ path: "age", value: "30" },
+]);
+
+// ✅ Value helpers (recommended)
+import { replace, formatValue } from "json-codemod";
+replace(source, [
+	{ path: "name", value: formatValue("Alice") }, // Automatic quote handling
+	{ path: "age", value: formatValue(30) },
+]);
+```
+
+However, manual formatting is still useful when you need precise control over the output format, such as custom whitespace or multi-line formatting.
+
+### Q: Should I use explicit or implicit operation types in batch?
+
+A: **Explicit operation types are recommended** for better code clarity and maintainability:
+
+```js
+// ✅ Explicit (recommended - self-documenting)
+batch(source, [
+	{ operation: "replace", path: "a", value: "1" },
+	{ operation: "delete", path: "b" },
+]);
+
+// ⚠️ Implicit (works but less clear)
+batch(source, [
+	{ path: "a", value: "1" },
+	{ path: "b" },
+]);
+```
+
+Both work identically, but explicit types make the intent clear at a glance.
+
 ### Q: Why does the value parameter need to be a string?
 
-A: For flexibility and precision. You have complete control over the output format, including quotes, spacing, etc.
+A: For flexibility and precision. You have complete control over the output format, including quotes, spacing, etc. However, we now provide value helpers to make this easier.
 
 ```js
 // Numbers don't need quotes
 replace(source, [{ path: "age", value: "30" }]);
+// Or use helper
+replace(source, [{ path: "age", value: formatValue(30) }]);
 
 // Strings need quotes
 replace(source, [{ path: "name", value: '"Alice"' }]);
+// Or use helper
+replace(source, [{ path: "name", value: formatValue("Alice") }]);
 
 // You can control formatting
 replace(source, [{ path: "data", value: '{\n  "key": "value"\n}' }]);
