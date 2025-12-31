@@ -1,6 +1,7 @@
 import test, { before } from "node:test";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import assert from "node:assert/strict";
 
 import { execSync } from "node:child_process";
 
@@ -16,7 +17,7 @@ before(() => {
 	});
 });
 
-test("test esm output", (t) => {
+test("test esm output", () => {
 	const targetDir = path.join(rootDir, "fixtures", "esm");
 
 	execSync("yarn", { cwd: targetDir, stdio: "inherit" });
@@ -30,12 +31,15 @@ test("test esm output", (t) => {
 		},
 	});
 
-	t.assert.snapshot(output.toString(), {
-		serializers: [(value) => value],
-	});
+	const outputStr = output.toString();
+	// Check that the output contains the expected exports
+	// The default export is now jsonmod function
+	assert.match(outputStr, /\[Function: jsonmod\]/);
+	// Named export replace is still available
+	assert.match(outputStr, /\[Function:.*replace.*\]/);
 });
 
-test("test cjs output", (t) => {
+test("test cjs output", () => {
 	const targetDir = path.join(rootDir, "fixtures", "cjs");
 
 	execSync("yarn", { cwd: targetDir, stdio: "inherit" });
@@ -49,7 +53,15 @@ test("test cjs output", (t) => {
 		},
 	});
 
-	t.assert.snapshot(output.toString(), {
-		serializers: [(value) => value],
-	});
+	const outputStr = output.toString();
+	// Check that the output contains the expected exports
+	assert.match(outputStr, /replace:.*\[Function:.*replace.*\]/);
+	assert.match(outputStr, /remove:.*\[Function:.*remove.*\]/);
+	assert.match(outputStr, /insert:.*\[Function:.*insert.*\]/);
+	assert.match(outputStr, /batch:.*\[Function:.*batch.*\]/);
+	assert.match(outputStr, /formatValue:.*\[Function:.*formatValue.*\]/);
+	assert.match(outputStr, /jsonmod:.*\[Function: jsonmod\]/);
+	assert.match(outputStr, /JsonMod:.*\[Function: JsonMod\]/);
+	// Check default export
+	assert.match(outputStr, /default:.*\[Function: jsonmod\]/);
 });

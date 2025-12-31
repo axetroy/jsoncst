@@ -33,9 +33,54 @@ pnpm add json-codemod
 
 ## 🚀 Quick Start
 
-### Using Value Helpers (Recommended)
+### New Chainable API ⭐ (Recommended)
 
-Value helpers make it easier to format values correctly without manual quote handling:
+The easiest way to modify JSON is with the new chainable API:
+
+```js
+import jsonmod from "json-codemod";
+
+const source = '{"name": "Alice", "age": 30, "items": [1, 2, 3]}';
+
+const result = jsonmod(source)
+  .replace("name", '"Bob"')
+  .replace("age", "31")
+  .delete("items[1]")
+  .insert("items", 3, "4")
+  .apply();
+
+// Result: {"name": "Bob", "age": 31, "items": [1, 3, 4]}
+```
+
+**Benefits:**
+- ✨ Fluent, chainable interface
+- 🎯 One function to import
+- 📝 Self-documenting code
+- 🔄 Sequential execution
+
+See [CHAINABLE_API.md](./CHAINABLE_API.md) for complete documentation.
+
+### With Value Helpers
+
+Combine with `formatValue` for automatic type handling:
+
+```js
+import jsonmod, { formatValue } from "json-codemod";
+
+const source = '{"name": "Alice", "age": 30, "active": false}';
+
+const result = jsonmod(source)
+  .replace("name", formatValue("Bob"))    // Strings get quotes automatically
+  .replace("age", formatValue(31))        // Numbers don't
+  .replace("active", formatValue(true))   // Booleans work too
+  .apply();
+
+// Result: {"name": "Bob", "age": 31, "active": true}
+```
+
+### Alternative: Functional API (Still Supported)
+
+The original functional API remains available:
 
 ```js
 import { replace, formatValue } from "json-codemod";
