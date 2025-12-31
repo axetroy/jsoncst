@@ -30,12 +30,12 @@ batch(source, [
 
 ## ✨ New Features
 
-### 1. Value Helper Utilities
+### 1. Value Helper Utility
 
-Seven new helper functions make value formatting intuitive:
+A new helper function makes value formatting intuitive:
 
 ```javascript
-import { formatValue, string, number, boolean, nullValue, object, array } from 'json-codemod';
+import { formatValue } from 'json-codemod';
 
 formatValue(42)          // "42"
 formatValue("hello")     // '"hello"'
@@ -43,17 +43,13 @@ formatValue(true)        // "true"
 formatValue(null)        // "null"
 formatValue({a: 1})      // '{"a":1}'
 formatValue([1, 2, 3])   // '[1,2,3]'
-
-// Or use type-specific helpers
-string("hello")          // '"hello"'
-number(42)               // "42"
-boolean(true)            // "true"
 ```
 
 **Benefits:**
 - Eliminates manual quote handling
 - Reduces common mistakes
 - More intuitive API
+- Single, simple function for all types
 
 ### 2. Enhanced Error Messages
 
@@ -169,7 +165,7 @@ writeFileSync('tsconfig.json', updated);
 
 ## 🧪 Testing
 
-- **93 tests** - All passing
+- **88 tests** - All passing
 - **ESM build** - Verified working
 - **CJS build** - Verified working
 - **Coverage** - Comprehensive test coverage for all features
@@ -215,7 +211,7 @@ console.log(result);
 
 2. **Update batch() calls:**
    - Add `operation` field to all patches
-   - Optionally use value helpers
+   - Optionally use formatValue helper
 
 3. **Run tests:**
    ```bash
@@ -226,9 +222,9 @@ console.log(result);
 
 ## 📊 Statistics
 
-- **Lines of code added:** ~500 (features + tests + docs)
-- **Tests added:** 4 new tests for explicit operations
-- **Functions added:** 7 value helper functions
+- **Lines of code:** Simplified by removing redundant functions
+- **Tests:** 88 tests, all passing
+- **Functions:** 1 value helper function (formatValue)
 - **Documentation:** 3 comprehensive documents
 
 ## 🙏 Acknowledgments

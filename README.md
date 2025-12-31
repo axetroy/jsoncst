@@ -512,23 +512,12 @@ formatValue(42); // "42"
 formatValue("hello"); // '"hello"'
 formatValue(true); // "true"
 formatValue(null); // "null"
+formatValue(42); // "42"
+formatValue("hello"); // '"hello"'
+formatValue(true); // "true"
+formatValue(null); // "null"
 formatValue({ a: 1 }); // '{"a":1}'
 formatValue([1, 2, 3]); // '[1,2,3]'
-```
-
-#### Type-Specific Helpers
-
-For convenience, type-specific helpers are also available:
-
-```js
-import { string, number, boolean, nullValue, object, array } from "json-codemod";
-
-string("hello"); // '"hello"'
-number(42); // "42"
-boolean(true); // "true"
-nullValue(); // "null"
-object({ a: 1 }); // '{"a":1}'
-array([1, 2, 3]); // '[1,2,3]'
 ```
 
 #### Usage Example
@@ -544,7 +533,7 @@ replace(source, [
 	{ path: "user.age", value: "31" },
 ]);
 
-// With helpers (automatic quote handling)
+// With helper (automatic quote handling)
 replace(source, [
 	{ path: "user.name", value: formatValue("Bob") }, // Automatic
 	{ path: "user.age", value: formatValue(31) },

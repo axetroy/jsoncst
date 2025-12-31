@@ -41,26 +41,18 @@ This document describes the API improvements made to json-codemod to address sev
 
 ### 1. Value Helper Utilities (值格式化工具函数)
 
-Added helper functions to make value formatting intuitive and less error-prone:
+Added a helper function to make value formatting intuitive and less error-prone:
 
 ```javascript
-import { formatValue, string, number, boolean, nullValue, object, array } from 'json-codemod';
+import { formatValue } from 'json-codemod';
 
-// Generic formatter - works with any type
+// Works with any type
 formatValue(42)          // "42"
 formatValue("hello")     // '"hello"'
 formatValue(true)        // "true"
 formatValue(null)        // "null"
 formatValue({a: 1})      // '{"a":1}'
 formatValue([1, 2, 3])   // '[1,2,3]'
-
-// Type-specific helpers
-string("hello")          // '"hello"'
-number(42)               // "42"
-boolean(true)            // "true"
-nullValue()              // "null"
-object({a: 1})           // '{"a":1}'
-array([1, 2, 3])         // '[1,2,3]'
 ```
 
 **Usage Example:**
