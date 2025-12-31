@@ -390,7 +390,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 -   [GitHub](https://github.com/axetroy/json-codemod)
 -   [npm](https://www.npmjs.com/package/json-codemod)
--   [API Documentation](./CHAINABLE_API.md)
 
 ## 🌟 Star History
 
